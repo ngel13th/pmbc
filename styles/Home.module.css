@@ -1,102 +1,179 @@
 .container {
-  padding: 0 2rem;
-}
-
-.main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
 }
 
-.footer {
+.main {
   display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
 }
 
-.footer a {
+.main p, .main a {
+  margin: 0.5em 2rem;
+  width: 100vw;
+}
+
+.main a {
+  cursor: pointer;
+  color: rgb(127, 210, 210);
+  font-size: 0.6rem;
+}
+
+.web3Container {
+  margin: 0px;
+  /* background-image: url();
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center; */
+  height: 100vh;
+  width: 100vw;
+  min-width: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logoContainer {
+  margin-left: 15px;
+  margin-top: 15px;
+  position: fixed;
+  width: 10%;
+  height: auto;
+}
+
+.logoContainer a {
+  margin: 0px;
+}
+
+.footerLogo {
+  width: clamp(10px, 50px, 100px);
+  margin-top: -6px;
+}
+
+.topLogoContainer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;
+  width: 100%;
+  background-color: transparent;
+  position: relative;
+  top: 0;
+  z-index: 0;
 }
 
-.title a {
-  color: #0d76fc;
-  text-decoration: none;
+.topLogo {
+  width: 90%;
+  max-width: 500px;
 }
 
-.title a:hover,
-.title a:focus,
-.title a:active {
-  text-decoration: underline;
+.bottomImg {
+  display: none;
+  width: 100%;
+  max-width: 608px;
+  background-color: transparent;
+  position: absolute;
+  bottom: 0;
+  z-index: 0;
 }
 
-.title {
-  margin: 3rem 0;
-  line-height: 1;
-  font-size: 2.5rem;
+.rainbowContainer {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: row;
+  background-image: url(../public/connect.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  cursor: pointer;
+  width: 100%;
+  height: 5%;
+  /* position: fixed;
+  right: 0; */
+  --rk-shadows-connectButton: transparent;
 }
 
-.title,
-.description {
+.rainbowContainer svg{
+  color: transparent;
+}
+
+.connected {
+  /* Background image for connected state */
+  background-image: url('../public/connected.png');
+  /* Other styles for the container in the connected state */
+}
+
+.rainbowContainer button {
+  --rk-colors-accentColor: rgba(0, 0, 0, 0);
+  --rk-colors-connectButtonBackground: rgba(0, 0, 0, 0);
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.rainbowContainer div {
+  width: 100%;
+}
+
+.mintContainer {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  height: 50%;
+  position: relative;
+  z-index: 1;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 20%;
+}
+
+.arrowButton {
+  margin: 10px 10px 0px;
+  width: auto;
+  height: 100%;
+  cursor: pointer;
+}
+
+.quantityImage {
+  width: auto;
+  height: 100%;
+}
+
+.mintButton {
+  margin: 5px;
+  height: 50%;
+  cursor: pointer;
+}
+
+.mintToControl {
+  display: none;
+  width: 60%;
+}
+
+.mintToControl input {
+  width: 100%;
   text-align: center;
+  font-size: 1em;
 }
 
-.description {
-  margin: 0 0 2rem;
-  line-height: 1.5;
-  font-size: 1.5rem;
-}
-
-.grid {
+.mintCostSupply {
+  margin: 0px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  max-width: 800px;
-}
-
-.card {
-  margin: 1rem;
-  padding: 1.5rem;
-  text-align: left;
-  color: inherit;
-  text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  max-width: 350px;
-}
-
-.card:hover,
-.card:focus,
-.card:active {
-  color: #0d76fc;
-  border-color: #0d76fc;
-}
-
-.card h2 {
-  margin: 0 0 1rem 0;
-  font-size: 1.2rem;
-}
-
-.card p {
-  margin: 0;
-  font-size: 1.2rem;
-  line-height: 1.5;
-}
-
-@media (max-width: 600px) {
-  .grid {
-    width: 100%;
-    flex-direction: column;
-  }
+  font-size: 1em;
+  text-align: center;
 }
