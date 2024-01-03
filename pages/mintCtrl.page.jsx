@@ -60,8 +60,8 @@ function MintComponent() {
         abi: _abi,
         functionName: 'mint',
         //args: [walletAddress, quantity, proof],
-        args: [walletAddress, quantity],
-        //args: [quantity, walletAddress],
+        //args: [walletAddress, quantity],
+        args: [quantity],
         value: (parseInt(_cost)).toString(),
     });
 
