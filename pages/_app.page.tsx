@@ -6,17 +6,17 @@ import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import {
   // arbitrum,
   // goerli,
-  //mainnet,
+  mainnet,
   // optimism,
-   polygon,
+  // polygon,
   // zora,
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
-    //mainnet,
-    polygon,
+    mainnet,
+    //polygon,
     //optimism,
     //arbitrum,
     //zora,
@@ -26,8 +26,8 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'Prime Mates Christmas club',
-  projectId: 'c513bf11456b9e56b0fab2f129001aae',
+  appName: 'Prime Mates Board club',
+  projectId: '3068911bbdc594bafe56dcfb79eb6718',
   chains,
 });
 
