@@ -52,7 +52,7 @@ function MintComponent() {
     const _paused = GetPaused();
     var errorFlag = false;
     const minQty = 1;
-    const maxQty = 20;
+    const maxQty = 5;
     const nativeToken = "ETH"; // ETH or MATIC
 
     const { data, isLoading, isSuccess, error, write } = useContractWrite({
@@ -152,7 +152,7 @@ function MintComponent() {
                 {mounted ? _paused == true && <p>Mint Currently Paused</p> : null}
                 {mounted ? _mintPhase == 0 && <p>Minting Soon</p> : null}
                 {mounted ? _mintPhase == 1 && <p>Whitelist Phase</p> : null}
-                {mounted ? _mintPhase == 2 && <p>{((parseInt(_cost)) / 10**18) ** quantity} {nativeToken}</p> : null}
+                {mounted ? _mintPhase == 2 && <p>{((parseInt(_cost)) / 10**18) * quantity} {nativeToken}</p> : null}
                 {mounted ? _supply >= 0 && <p>Supply: {parseInt(_supply)} / 2222</p> : null}
             </div>
             <div className={styles.mintButton}>
