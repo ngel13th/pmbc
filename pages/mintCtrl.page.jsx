@@ -53,7 +53,7 @@ function MintComponent() {
     var errorFlag = false;
     const minQty = 1;
     const maxQty = 20;
-    const nativeToken = "MATIC"; // ETH or MATIC
+    const nativeToken = "ETH"; // ETH or MATIC
 
     const { data, isLoading, isSuccess, error, write } = useContractWrite({
         address: GetContractAddy(),
