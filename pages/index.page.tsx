@@ -24,7 +24,7 @@ const Home: NextPage = () => {
       <main className={styles.main}>
 
         <Wallet />
-        /* {mounted ? isAdmin && <AdminComponent /> : null} */
+        
         
       </main>
 
