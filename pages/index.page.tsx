@@ -16,7 +16,7 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Prime Mates Christmas Club Mint</title>
+        <title>Prime Mates Board Club Mint</title>
         <meta name="description" content="" />
         <link href="/icon.png" rel="icon" type="image/x-icon"/>
       </Head>
@@ -31,10 +31,10 @@ const Home: NextPage = () => {
       <img src="/bottomImg.png" alt="Logo" className={styles.bottomImg} />
 
       <footer className={styles.footer}>
-        <Link href="https://opensea.io/collection/prime-mates-christmas-club" rel="noopener noreferrer" target="_blank">
+        <Link href="https://opensea.io/collection/pmbc" rel="noopener noreferrer" target="_blank">
           <img src="/opensea_icon.png" alt="OpenSea" className={styles.footerLogo} />
         </Link>
-        <Link href="https://polygonscan.com/address/0xAb9f149A82C6ad66C3795FBceb06ec351b13cfcf" rel="noopener noreferrer" target="_blank">
+        <Link href="https://etherscan.io/address/0x12662b6a2a424a0090b7d09401fb775a9b968898" rel="noopener noreferrer" target="_blank">
           <img src="/eth_icon.png" alt="Etherscan" className={styles.footerLogo} />
         </Link>
         <Link href="https://twitter.com/PrimeMatesBC" rel="noopener noreferrer" target="_blank">
