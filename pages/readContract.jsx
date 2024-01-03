@@ -27,8 +27,8 @@ export function GetCost(_sender, _amount) {
     const { data, isError, isLoading } = useContractRead({
         address: _abiAddress,
         abi: _abi,
-        functionName: 'getCost',
-        args: [_amount],
+        functionName: 'cost',
+        args: [],
         account: _sender,
     });
 
