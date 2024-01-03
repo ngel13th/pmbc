@@ -58,10 +58,10 @@ function MintComponent() {
     const { data, isLoading, isSuccess, error, write } = useContractWrite({
         address: GetContractAddy(),
         abi: _abi,
-        functionName: 'mintForAddress',
+        functionName: 'mint',
         //args: [walletAddress, quantity, proof],
-        //args: [walletAddress, quantity],
-        args: [quantity, walletAddress],
+        args: [walletAddress, quantity],
+        //args: [quantity, walletAddress],
         value: (parseInt(_cost)).toString(),
     });
 
