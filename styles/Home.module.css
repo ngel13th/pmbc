@@ -53,6 +53,7 @@
 .footerLogo {
   width: clamp(10px, 50px, 100px);
   margin-top: -6px;
+  padding: 5px;
 }
 
 .topLogoContainer {
