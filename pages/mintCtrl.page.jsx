@@ -62,7 +62,7 @@ function MintComponent() {
         //args: [walletAddress, quantity, proof],
         //args: [walletAddress, quantity],
         args: [quantity],
-        value: (parseInt(_cost)).toString(),
+        value: (parseInt(_cost)*quantity).toString(),
     });
 
     if (error && !errorFlag) {
