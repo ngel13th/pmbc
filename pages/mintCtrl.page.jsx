@@ -45,8 +45,8 @@ function MintComponent() {
     const [walletAddress, setWalletAddress] = useState('');
     //var proof = GetProof(walletAddress);
     //const isOnList = proof.length > 0;
-    const _cost = GetCost(address,quantity);
-    //const _cost = 0.05;
+    //const _cost = GetCost(address,quantity);
+    const _cost = 0.05;
     const _supply = GetSupply();
     //const _mintPhase = GetMintPhase();
     const _mintPhase = 2;
