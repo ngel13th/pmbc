@@ -1,151 +1,52 @@
 import React, { useState } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
-import { useIsMounted } from './useIsMounted';
-import { GetPaused, GetSupply } from './readContract';
-import { _abi, GetContractAddy } from './abiGet';
-import { utils } from "ethers";
+import { utils } from 'ethers';
 import styles from '../styles/Home.module.css';
+
+const MINT_PRICE_ETH = 0.05;
+const MIN_QTY = 1;
+const MAX_QTY = 5;
 
 function MintComponent() {
   const { address } = useAccount();
-  const mounted = useIsMounted();
   const [quantity, setQuantity] = useState(1);
-  const [walletAddress, setWalletAddress] = useState('');
-  const [supply, setSupply] = useState(null);
-  const [paused, setPaused] = useState(false);
 
-  const minQty = 1;
-  const maxQty = 5;
-  const nativeToken = "ETH";
-  const mintPhase = 2;
-  const FIXED_COST_ETH = 0.05;
+  // Calculate total price in ETH and wei
+  const totalPriceEth = (MINT_PRICE_ETH * quantity).toFixed(4);
+  const valueInWei = utils.parseEther((MINT_PRICE_ETH * quantity).toString()).toString();
 
-  // Get supply & paused status if needed
-  React.useEffect(() => {
-    async function fetchDetails() {
-      try {
-        const supplyVal = await GetSupply();
-        setSupply(supplyVal);
-
-        const pausedVal = await GetPaused();
-        setPaused(pausedVal);
-      } catch (e) {
-        setSupply(null);
-        setPaused(false);
-      }
-    }
-    fetchDetails();
-  }, []);
-
-  // Prepare value for contract call
-  const valueInWei = utils.parseEther((FIXED_COST_ETH * quantity).toString()).toString();
-
-  const { error, write } = useContractWrite({
-    address: GetContractAddy(),
-    abi: _abi,
+  const { write, error } = useContractWrite({
+    address: "0x12662b6a2a424a0090b7d09401fb775a9b968898",
+    abi: [/* your contract ABI */],
     functionName: 'mint',
     args: [quantity],
     value: valueInWei,
   });
 
-  const handleDecreaseQuantity = () => {
-    if (quantity > minQty) setQuantity(quantity - 1);
-  };
-
-  const handleIncreaseQuantity = () => {
-    if (quantity < maxQty) setQuantity(quantity + 1);
-  };
-
-  const handleWalletChange = (event) => {
-    setWalletAddress(event.target.value);
-  };
-
   const handleMintClick = () => {
     if (!address) {
-      alert(`Error: Not Connected`);
+      alert('Connect your wallet!');
       return;
     }
-    if (paused) {
-      alert(`Error: Paused`);
-      return;
-    }
-    if (walletAddress.length !== 42) {
-      alert(`Confirm your send to ${address} then press Mint to complete transaction.`);
-      setWalletAddress(address);
-    } else {
-      try {
-        write();
-      } catch (error) {
-        console.error('Error while minting:', error);
-        alert('An error occurred while minting. Please try again later.');
-      }
+    try {
+      write();
+    } catch (e) {
+      alert('Mint failed: ' + e.message);
     }
   };
-
-  const totalPrice = (FIXED_COST_ETH * quantity).toFixed(4);
 
   return (
     <div className={styles.mintContainer}>
-      <div className={styles.quantityControl}>
-        {mounted && mintPhase !== 0 && (
-          <img
-            src="/left_arrow.png"
-            alt="Decrease Quantity"
-            onClick={handleDecreaseQuantity}
-            className={styles.arrowButton}
-            style={{ opacity: quantity === minQty ? 0.4 : 1, cursor: quantity === minQty ? "not-allowed" : "pointer" }}
-          />
-        )}
-
-        <img
-          src={`/${quantity}.png`}
-          alt={`Quantity: ${quantity}`}
-          className={styles.quantityImage}
-        />
-
-        {mounted && mintPhase !== 0 && (
-          <img
-            src="/right_arrow.png"
-            alt="Increase Quantity"
-            onClick={handleIncreaseQuantity}
-            className={styles.arrowButton}
-            style={{ opacity: quantity === maxQty ? 0.4 : 1, cursor: quantity === maxQty ? "not-allowed" : "pointer" }}
-          />
-        )}
+      <div>
+        <button disabled={quantity <= MIN_QTY} onClick={() => setQuantity(quantity - 1)}>-</button>
+        <span>{quantity}</span>
+        <button disabled={quantity >= MAX_QTY} onClick={() => setQuantity(quantity + 1)}>+</button>
       </div>
-
-      <div className={styles.mintToControl}>
-        <br />
-        <input
-          type="text"
-          value={walletAddress}
-          onChange={handleWalletChange}
-          placeholder="Wallet Address"
-        />
+      <div>
+        <p>Price: {totalPriceEth} ETH</p>
       </div>
-
-      <div className={styles.mintCostSupply}>
-        {mounted && paused && <p>Mint Currently Paused</p>}
-        {mounted && mintPhase === 0 && <p>Minting Soon</p>}
-        {mounted && mintPhase === 1 && <p>Whitelist Phase</p>}
-        {mounted && mintPhase === 2 && (
-          <p>{totalPrice} {nativeToken}</p>
-        )}
-        {mounted && supply !== null && (
-          <p>Supply: {Number(supply)} / 2222</p>
-        )}
-      </div>
-
-      <div className={styles.mintButton}>
-        <img
-          src="/mint.png"
-          alt="Mint Button"
-          onClick={handleMintClick}
-          className={styles.mintButton}
-        />
-      </div>
-
-      {error && <div style={{ color: 'red', marginTop: 10 }}>Error: {error.message}</div>}
+      <button onClick={handleMintClick}>Mint</button>
+      {error && <div style={{color:'red'}}>Mint failed: {error.message}</div>}
     </div>
   );
 }
