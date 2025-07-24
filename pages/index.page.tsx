@@ -1,48 +1,103 @@
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-import React from 'react';
-import Wallet from './wallet.page';
-import Link from 'next/link';
-import AdminComponent from './adminCtrl.page';
-import { useAccount } from 'wagmi';
-import { useIsMounted } from './useIsMounted';
-import { AdminCheck } from './readContract';
+import React, { useState } from 'react';
 
-const Home: NextPage = () => {
-  const { address } = useAccount();
-  const isAdmin = AdminCheck(address);
-  const mounted = useIsMounted();
+// Optional: replace with your actual CSS module import
+// import styles from '../styles/Home.module.css';
+
+const FIXED_COST_ETH = 0.05;
+const MIN_QTY = 1;
+const MAX_QTY = 5;
+
+function MintComponent() {
+  const [quantity, setQuantity] = useState(1);
+
+  // Calculate the total price
+  const totalPriceEth = (FIXED_COST_ETH * quantity).toFixed(4);
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Prime Mates Board Club Mint</title>
-        <meta name="description" content="" />
-        <link href="/icon.png" rel="icon" type="image/x-icon"/>
-      </Head>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      width: '100%',
+      marginTop: '40px'
+    }}>
+      {/* Quantity Controls */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '10px'
+      }}>
+        <button
+          style={{
+            fontSize: 28,
+            padding: '4px 18px',
+            marginRight: 16,
+            borderRadius: 8,
+            border: 'none',
+            background: '#eee',
+            cursor: quantity === MIN_QTY ? 'not-allowed' : 'pointer',
+            opacity: quantity === MIN_QTY ? 0.5 : 1
+          }}
+          disabled={quantity === MIN_QTY}
+          onClick={() => setQuantity(q => Math.max(MIN_QTY, q - 1))}
+        >↓</button>
 
-      <main className={styles.main}>
+        <span style={{
+          fontSize: 48,
+          fontWeight: 'bold',
+          margin: '0 10px'
+        }}>{quantity}</span>
 
-        <Wallet />
-        
-        
-      </main>
+        <button
+          style={{
+            fontSize: 28,
+            padding: '4px 18px',
+            marginLeft: 16,
+            borderRadius: 8,
+            border: 'none',
+            background: '#eee',
+            cursor: quantity === MAX_QTY ? 'not-allowed' : 'pointer',
+            opacity: quantity === MAX_QTY ? 0.5 : 1
+          }}
+          disabled={quantity === MAX_QTY}
+          onClick={() => setQuantity(q => Math.min(MAX_QTY, q + 1))}
+        >↑</button>
+      </div>
 
-      <img src="/bottomImg.png" alt="Logo" className={styles.bottomImg} />
+      {/* Price Display */}
+      <p style={{
+        textAlign: 'center',
+        fontWeight: 700,
+        fontSize: 28,
+        margin: '0 0 30px 0',
+        background: 'rgba(255,255,255,0.85)',
+        borderRadius: 12,
+        padding: '8px 30px',
+        boxShadow: '0 1px 8px #ccc',
+        letterSpacing: 2,
+        color: '#333'
+      }}>
+        {totalPriceEth} ETH
+      </p>
 
-      <footer className={styles.footer}>
-        <Link href="https://opensea.io/collection/pmbc" rel="noopener noreferrer" target="_blank">
-          <img src="/opensea_icon.png" alt="OpenSea" className={styles.footerLogo} />
-        </Link>
-        <Link href="https://etherscan.io/address/0x12662b6a2a424a0090b7d09401fb775a9b968898" rel="noopener noreferrer" target="_blank">
-          <img src="/eth_icon.png" alt="Etherscan" className={styles.footerLogo} />
-        </Link>
-        <Link href="https://twitter.com/PrimeMatesBC" rel="noopener noreferrer" target="_blank">
-          <img src="/x_icon.png" alt="Twitter" className={styles.footerLogo} />
-        </Link>
-      </footer>
+      {/* Mint Button */}
+      <button style={{
+        padding: '16px 36px',
+        fontSize: 28,
+        fontWeight: 700,
+        borderRadius: 12,
+        background: 'black',
+        color: 'yellow',
+        border: 'none',
+        cursor: 'pointer',
+        boxShadow: '0 2px 12px #eee'
+      }}>
+        MINT NOW
+      </button>
     </div>
   );
-};
+}
 
-export default Home;
+export default MintComponent;
