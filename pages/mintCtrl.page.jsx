@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import styles from '../styles/Home.module.css'; // Use your CSS module if you want
 
-function MintComponent() {
+const FIXED_COST_ETH = 0.05;
+
+const MintCtrlPage = () => {
   const [quantity, setQuantity] = useState(1);
-  const FIXED_COST_ETH = 0.05;
 
   return (
     <div className={styles.mintContainer}>
-      {/* Custom Quantity Control */}
+      {/* Quantity Controls */}
       <div className={styles.quantityControl} style={{ marginBottom: 16 }}>
         <button
           onClick={() => setQuantity(q => Math.max(1, q - 1))}
@@ -89,7 +90,7 @@ function MintComponent() {
       </button>
     </div>
   );
-}
+};
 
-export default MintComponent;
+export default MintCtrlPage;
 
