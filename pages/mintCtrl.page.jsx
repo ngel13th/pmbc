@@ -13,7 +13,7 @@ function MintComponent() {
   const [walletAddress, setWalletAddress] = useState('');
   const [cost, setCost] = useState(0);
   const [supply, setSupply] = useState(0);
-  const [paused, setPaused] = useState(true);
+  const [paused, setPaused] = useState(false);
 
   const mintPhase = 2; // 🔥 PUBLIC MINT IS LIVE
   const minQty = 1;
@@ -31,7 +31,7 @@ function MintComponent() {
         ]);
         setCost(parseFloat(ethers.formatEther(costRaw)));
         setSupply(parseInt(supplyRaw));
-        setPaused(pausedRaw === true);
+        setPaused(pausedRaw === false);
       } catch (err) {
         console.error("Error fetching contract data", err);
       }
