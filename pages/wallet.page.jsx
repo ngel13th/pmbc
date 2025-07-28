@@ -1,53 +1,34 @@
-import React, { useState } from "react";
-import styles from '../styles/Home.module.css'; // Adjust path if needed
+import React, { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import MintComponent from './mintCtrl.page';
+import styles from '../styles/Home.module.css';
+  
+function Wallet() {
+  const { address } = useAccount();
+  const [isConnected, setIsConnected] = useState(false);
 
-const FIXED_COST_ETH = 0.05;
-const MIN_QTY = 1;
-const MAX_QTY = 5;
-
-const MintBox = () => {
-  const [quantity, setQuantity] = useState(1);
-
-  const totalPriceEth = (FIXED_COST_ETH * quantity).toFixed(4);
+  useEffect(() => {
+    // Check if address is not null or empty to determine if the wallet is connected
+    setIsConnected(!!address);
+  }, [address]);
 
   return (
-    <div className={styles.mintCenter}>
-      {/* Quantity Control */}
-      <div className={styles.quantityRow}>
-        <button
-          className={styles.quantityArrow}
-          onClick={() => setQuantity(q => Math.max(MIN_QTY, q - 1))}
-          disabled={quantity === MIN_QTY}
-        >↓</button>
-        <span className={styles.quantityNumber}>{quantity}</span>
-        <button
-          className={styles.quantityArrow}
-          onClick={() => setQuantity(q => Math.min(MAX_QTY, q + 1))}
-          disabled={quantity === MAX_QTY}
-        >↑</button>
+    <div className={styles.web3Container}>
+      <div className={styles.topLogoContainer}>
+        <img src="/topLogo.png" alt="Logo" className={styles.topLogo} />
       </div>
 
-      {/* ETH Price */}
-      <div className={styles.ethPrice}>
-        {totalPriceEth} ETH
+      <div
+        className={`${styles.rainbowContainer} ${
+          isConnected ? styles.connected : styles.disconnected
+        }`}
+      >
+        <ConnectButton label="" accountStatus="" chainStatus="none" showBalance={false} />
       </div>
-
-      {/* Mint Button */}
-      <button style={{
-        padding: '16px 36px',
-        fontSize: 28,
-        fontWeight: 700,
-        borderRadius: 12,
-        background: 'black',
-        color: 'yellow',
-        border: 'none',
-        cursor: 'pointer',
-        boxShadow: '0 2px 12px #eee'
-      }}>
-        MINT NOW
-      </button>
+      <MintComponent />
     </div>
   );
-};
+}
 
-export default MintBox;
+export default Wallet;
