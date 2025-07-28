@@ -1,96 +1,173 @@
 import React, { useState } from 'react';
-import styles from '../styles/Home.module.css'; // Use your CSS module if you want
+import { useAccount, useContractWrite } from 'wagmi';
+import { useIsMounted } from './useIsMounted';
+import { GetPaused, GetSupply, GetCost } from './readContract';
+import { _abi, _abiAddress, _listWallets, GetContractAddy } from './abiGet';
+//import { MerkleTree } from 'merkletreejs';
+//import { keccak256 } from 'ethers';
+import styles from '../styles/Home.module.css';
 
-const FIXED_COST_ETH = 0.05;
+// function GetProof(_address) {
+//     if(!_address || !isValidEthereumAddress(_address)) return [];
+//     // Convert the wallet addresses to an array of strings
+//     const walletAddresses = _listWallets.map(x => keccak256(x));
+//     const merkleTree = new MerkleTree(walletAddresses, keccak256, { sortPairs: true });
 
-const MintCtrlPage = () => {
-  const [quantity, setQuantity] = useState(1);
+//     // Get the index of the wallet address you want to generate a proof for
+//     const wallet = walletAddresses.find(w => w.toLowerCase() === keccak256(_address));
+//     if(wallet){
+//         // Generate a proof for the specified wallet;
+//         const proof = merkleTree.getHexProof(wallet);
+//         // Print the proof
+//         console.log("Proof:", proof);
+//         return proof;
+//     } else {
+//         console.error(`Wallet ${_address} not found in the list.`);
+//         return [];
+//     }
+// }
 
-  return (
-    <div className={styles.mintContainer}>
-      {/* Quantity Controls */}
-      <div className={styles.quantityControl} style={{ marginBottom: 16 }}>
-        <button
-          onClick={() => setQuantity(q => Math.max(1, q - 1))}
-          disabled={quantity === 1}
-          style={{
-            fontSize: 36,
-            width: 48,
-            height: 48,
-            borderRadius: 12,
-            border: 'none',
-            background: '#eee',
-            marginRight: 24,
-            cursor: quantity === 1 ? 'not-allowed' : 'pointer',
-            opacity: quantity === 1 ? 0.5 : 1,
-            boxShadow: '0 1px 6px #bbb',
-          }}
-        >–</button>
-        <span
-          style={{
-            fontSize: 48,
-            fontWeight: 700,
-            width: 56,
-            textAlign: 'center',
-            display: 'inline-block',
-            color: '#333',
-            letterSpacing: 2,
-          }}
-        >
-          {quantity}
-        </span>
-        <button
-          onClick={() => setQuantity(q => Math.min(5, q + 1))}
-          disabled={quantity === 5}
-          style={{
-            fontSize: 36,
-            width: 48,
-            height: 48,
-            borderRadius: 12,
-            border: 'none',
-            background: '#eee',
-            marginLeft: 24,
-            cursor: quantity === 5 ? 'not-allowed' : 'pointer',
-            opacity: quantity === 5 ? 0.5 : 1,
-            boxShadow: '0 1px 6px #bbb',
-          }}
-        >+</button>
-      </div>
-      {/* Price */}
-      <div className={styles.mintCostSupply}>
-        <p style={{
-          textAlign: 'center',
-          fontWeight: 700,
-          fontSize: 28,
-          margin: '12px 0 24px 0',
-          background: 'rgba(255,255,255,0.92)',
-          borderRadius: 10,
-          padding: '8px 32px',
-          boxShadow: '0 2px 8px #eee',
-          letterSpacing: 2,
-          color: '#111',
-          minWidth: 150,
-        }}>
-          {(FIXED_COST_ETH * quantity).toFixed(4)} ETH
-        </p>
-      </div>
-      {/* Mint Button */}
-      <button style={{
-        padding: '16px 36px',
-        fontSize: 28,
-        fontWeight: 700,
-        borderRadius: 12,
-        background: 'black',
-        color: 'yellow',
-        border: 'none',
-        cursor: 'pointer',
-        boxShadow: '0 2px 12px #eee',
-      }}>
-        MINT NOW
-      </button>
-    </div>
-  );
-};
+// function isValidEthereumAddress(_address) {
+//     // Check if the address is a non-empty string
+//     if (typeof _address !== 'string' || _address.length !== 42) {
+//         return false;
+//     }
 
-export default MintCtrlPage;
+//     // Check if the address matches the Ethereum address pattern
+//     const addressRegex = /^0x[0-9a-fA-F]{40}$/;
+//     return addressRegex.test(_address);
+// }
 
+function MintComponent() {
+    const { address } = useAccount();
+    const mounted = useIsMounted();
+    const [quantity, setQuantity] = useState(1);
+    const [walletAddress, setWalletAddress] = useState('');
+    //var proof = GetProof(walletAddress);
+    //const isOnList = proof.length > 0;
+    const _cost = GetCost(address,quantity);
+    //const _cost = 0.05;
+    const _supply = GetSupply();
+    //const _mintPhase = GetMintPhase();
+    const _mintPhase = 2;
+    const _paused = GetPaused();
+    var errorFlag = false;
+    const minQty = 1;
+    const maxQty = 5;
+    const nativeToken = "ETH"; // ETH or MATIC
+
+    const { data, isLoading, isSuccess, error, write } = useContractWrite({
+        address: GetContractAddy(),
+        abi: _abi,
+        functionName: 'mint',
+        //args: [walletAddress, quantity, proof],
+        //args: [walletAddress, quantity],
+        args: [quantity],
+        value: (parseInt(_cost)*quantity).toString(),
+    });
+
+    if (error && !errorFlag) {
+        alert(`Error: ${error.message}`); // Display the error message in an alert
+        errorFlag = true;
+    }
+
+    const handleDecreaseQuantity = () => {
+        if (quantity > minQty) {
+            setQuantity(quantity - 1);
+        }
+    };
+
+    const handleIncreaseQuantity = () => {
+        if (quantity < maxQty) {
+            setQuantity(quantity + 1);
+        }
+    };
+
+    const handleWalletChange = (event) => {
+        setWalletAddress(event.target.value);
+        //proof = GetProof(event.target.value);
+    };
+
+    const handleMintClick = () => {
+        // Perform minting logic here
+        if (!address) {
+            alert(`Error: Not Connected`);
+            return;
+        }
+        if (_paused == true){
+            alert(`Error: Paused`);
+            return;
+        }
+        if (walletAddress.length !== 42) {
+            alert(`Confirm your send to ${address} then press Mint to complete transaction.`);
+            setWalletAddress(address);
+        } else {
+            try {
+                write(); // Call the write function
+                //alert(`This would have minted ${quantity} NFTs!`);
+            } catch (error) {
+                console.error('Error while minting:', error);
+                alert('An error occurred while minting. Please try again later.');
+            }
+        }
+    };
+
+    return (
+        <div className={styles.mintContainer}>
+            <div className={styles.quantityControl}>
+                {mounted ? _mintPhase != 0 && 
+                    <img
+                        src="/left_arrow.png"
+                        alt="Decrease Quantity"
+                        onClick={handleDecreaseQuantity}
+                        className={styles.arrowButton}
+                        disabled={quantity === minQty}
+                    /> : null
+                }
+
+                <img
+                    src={`/${quantity}.png`}
+                    alt={`Quantity: ${quantity}`}
+                    className={styles.quantityImage}
+                />
+                {mounted ? _mintPhase != 0 && 
+                    <img
+                        src="/right_arrow.png"
+                        alt="Increase Quantity"
+                        onClick={handleIncreaseQuantity}
+                        className={styles.arrowButton}
+                        disabled={quantity === maxQty}
+                    /> : null
+                }
+
+            </div>
+            <div className={styles.mintToControl}>
+                <br></br>
+                <input
+                    type="text"
+                    value={walletAddress}
+                    onChange={handleWalletChange}
+                    placeholder="Wallet Address"
+                />
+            </div>
+            <div className={styles.mintCostSupply}>
+                {mounted ? _paused == true && <p>Mint Currently Paused</p> : null}
+                {mounted ? _mintPhase == 0 && <p>Minting Soon</p> : null}
+                {mounted ? _mintPhase == 1 && <p>Whitelist Phase</p> : null}
+                {mounted ? _mintPhase == 2 && <p>{((parseInt(_cost)) / 10**18) * quantity} {nativeToken}</p> : null}
+                {mounted ? _supply >= 0 && <p>Supply: {parseInt(_supply)} / 2222</p> : null}
+            </div>
+            <div className={styles.mintButton}>
+                <img
+                    src="/mint.png"
+                    alt="Mint Button"
+                    onClick={handleMintClick}
+                    className={styles.mintButton}
+                />
+            </div>
+
+        </div>
+    );
+}
+
+export default MintComponent;
