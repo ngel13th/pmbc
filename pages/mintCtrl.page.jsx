@@ -75,8 +75,7 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
-      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — Phase 2</h2>
-
+      
       <div className={styles.quantityControl}>
         {mounted && (
           <>
