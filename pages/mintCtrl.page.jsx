@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
-import { GetPaused, GetSupply, GetCost, GetMintPhase } from './readContract';
+import { GetPaused, GetSupply, GetCost } from './readContract';
 import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
 
@@ -13,28 +13,25 @@ function MintComponent() {
   const [walletAddress, setWalletAddress] = useState('');
   const [cost, setCost] = useState(0);
   const [supply, setSupply] = useState(0);
-  const [mintPhase, setMintPhase] = useState(0);
   const [paused, setPaused] = useState(true);
 
+  const mintPhase = 2; // 🔥 PUBLIC MINT IS LIVE
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
-  const mintPhase = 2; // Public mint is live 🎉
 
   useEffect(() => {
     async function fetchContractValues() {
       if (!address) return;
       try {
-        const [costRaw, supplyRaw, mintPhaseRaw, pausedRaw] = await Promise.all([
+        const [costRaw, supplyRaw, pausedRaw] = await Promise.all([
           GetCost(address, quantity),
           GetSupply(),
-          GetMintPhase(),
           GetPaused()
         ]);
         setCost(parseFloat(ethers.formatEther(costRaw)));
         setSupply(parseInt(supplyRaw));
-        setMintPhase(parseInt(mintPhaseRaw));
-        setPaused(pausedRaw === false);
+        setPaused(pausedRaw === true);
       } catch (err) {
         console.error("Error fetching contract data", err);
       }
@@ -78,8 +75,10 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
+      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — Phase 2</h2>
+
       <div className={styles.quantityControl}>
-        {mounted && mintPhase !== 0 && (
+        {mounted && (
           <>
             <img
               src="/left_arrow.png"
@@ -114,10 +113,9 @@ function MintComponent() {
       </div>
 
       <div className={styles.mintCostSupply}>
-        {mounted && <p>Mint is Live!</p>}
-        {mounted && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
+        {mounted && paused && <p>Mint Currently Paused</p>}
+        {mounted && !paused && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
         {mounted && <p>Supply: {supply} / 2222</p>}
-
       </div>
 
       <div className={styles.mintButton}>
