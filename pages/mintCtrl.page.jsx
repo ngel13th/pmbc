@@ -12,7 +12,7 @@ function MintComponent() {
   const [quantity, setQuantity] = useState(1);
   const [walletAddress, setWalletAddress] = useState('');
   const [supply, setSupply] = useState(0);
-  const [paused, setPaused] = useState(true);
+  const [paused, setPaused] = useState(false);
 
   const mintPhase = 2; // Live Mint
   const fixedCost = 0.05; // ETH per item
@@ -28,7 +28,7 @@ function MintComponent() {
           GetPaused()
         ]);
         setSupply(parseInt(supplyRaw));
-        setPaused(pausedRaw === true);
+        setPaused(pausedRaw === false);
       } catch (err) {
         console.error("Error fetching contract data", err);
       }
