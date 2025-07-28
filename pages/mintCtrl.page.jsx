@@ -19,6 +19,7 @@ function MintComponent() {
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
+  const mintPhase = 2; // Public mint is live 🎉
 
   useEffect(() => {
     async function fetchContractValues() {
@@ -113,11 +114,10 @@ function MintComponent() {
       </div>
 
       <div className={styles.mintCostSupply}>
-        {mounted && paused && <p>Mint Currently Paused</p>}
-        {mounted && mintPhase === 0 && <p>Minting Soon</p>}
-        {mounted && mintPhase === 1 && <p>Whitelist Phase</p>}
-        {mounted && mintPhase === 2 && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
+        {mounted && <p>Mint is Live!</p>}
+        {mounted && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
         {mounted && <p>Supply: {supply} / 2222</p>}
+
       </div>
 
       <div className={styles.mintButton}>
