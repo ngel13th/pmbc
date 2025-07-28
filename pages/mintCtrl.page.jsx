@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { useAccount, useContractRead, useContractWrite } from 'wagmi';
+import React, { useState, useEffect } from 'react';
+import { useAccount, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
-import { _abi, _abiAddress, GetContractAddy } from './abiGet';
+import { usePaused, useSupply } from './readContract';
+import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
 
 function MintComponent() {
@@ -10,26 +11,30 @@ function MintComponent() {
   const mounted = useIsMounted();
   const [quantity, setQuantity] = useState(1);
   const [walletAddress, setWalletAddress] = useState('');
+  const [supply, setSupply] = useState(0);
+  const [paused, setPaused] = useState(true);
 
+  const mintPhase = 2; // Live Mint
+  const fixedCost = 0.05; // ETH per item
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
-  const fixedCost = 0.05;
 
-  const { data: supplyRaw, isLoading: loadingSupply } = useContractRead({
-    address: _abiAddress,
-    abi: _abi,
-    functionName: 'totalSupply',
-  });
-
-  const { data: pausedRaw } = useContractRead({
-    address: _abiAddress,
-    abi: _abi,
-    functionName: 'paused',
-  });
-
-  const paused = pausedRaw === true;
-  const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
+  useEffect(() => {
+    async function fetchContractValues() {
+      try {
+        const [supplyRaw, pausedRaw] = await Promise.all([
+          GetSupply(),
+          GetPaused()
+        ]);
+        setSupply(parseInt(supplyRaw));
+        setPaused(pausedRaw === true);
+      } catch (err) {
+        console.error("Error fetching contract data", err);
+      }
+    }
+    fetchContractValues();
+  }, []);
 
   const { write, isLoading, error } = useContractWrite({
     address: GetContractAddy(),
@@ -48,14 +53,9 @@ function MintComponent() {
   };
 
   const handleMintClick = () => {
-    if (!address) {
-      alert('Error: Wallet not connected');
-      return;
-    }
-    if (paused) {
-      alert('Error: Minting is paused');
-      return;
-    }
+    if (!address) return alert('Error: Wallet not connected');
+    if (paused) return alert('Error: Minting is paused');
+
     if (walletAddress.length !== 42) {
       alert(`Confirm your send to ${address} then press Mint to complete transaction.`);
       setWalletAddress(address);
@@ -72,6 +72,7 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
+      
       <div className={styles.quantityControl}>
         {mounted && (
           <>
@@ -108,9 +109,9 @@ function MintComponent() {
       </div>
 
       <div className={styles.mintCostSupply}>
-        {paused && <p>Mint Currently Paused</p>}
-        {!paused && <p>Total: {(fixedCost * quantity).toFixed(4)} {nativeToken}</p>}
-        {!loadingSupply && <p>Supply: {supply} / 2222</p>}
+        {mounted && paused && <p>Mint Currently Paused</p>}
+        {mounted && !paused && <p>Total: {(fixedCost * quantity).toFixed(4)} {nativeToken}</p>}
+        {mounted && <p>Supply: {supply} / 2222</p>}
       </div>
 
       <div className={styles.mintButton}>
