@@ -33,7 +33,7 @@ function MintComponent() {
         setCost(parseFloat(ethers.formatEther(costRaw)));
         setSupply(parseInt(supplyRaw));
         setMintPhase(parseInt(mintPhaseRaw));
-        setPaused(pausedRaw === true);
+        setPaused(pausedRaw === false);
       } catch (err) {
         console.error("Error fetching contract data", err);
       }
