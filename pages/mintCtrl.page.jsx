@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
-import { GetPaused, GetSupply, GetCost } from './readContract';
+import { GetPaused, GetSupply } from './readContract';
 import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
 
@@ -11,40 +11,37 @@ function MintComponent() {
   const mounted = useIsMounted();
   const [quantity, setQuantity] = useState(1);
   const [walletAddress, setWalletAddress] = useState('');
-  const [cost, setCost] = useState(0);
   const [supply, setSupply] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(true);
 
-  const mintPhase = 2; // 🔥 PUBLIC MINT IS LIVE
+  const mintPhase = 2; // Live Mint
+  const fixedCost = 0.05; // ETH per item
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
 
   useEffect(() => {
     async function fetchContractValues() {
-      if (!address) return;
       try {
-        const [costRaw, supplyRaw, pausedRaw] = await Promise.all([
-          GetCost(address, quantity),
+        const [supplyRaw, pausedRaw] = await Promise.all([
           GetSupply(),
           GetPaused()
         ]);
-        setCost(parseFloat(ethers.formatEther(costRaw)));
         setSupply(parseInt(supplyRaw));
-        setPaused(pausedRaw === false);
+        setPaused(pausedRaw === true);
       } catch (err) {
         console.error("Error fetching contract data", err);
       }
     }
     fetchContractValues();
-  }, [address, quantity]);
+  }, []);
 
   const { write, isLoading, error } = useContractWrite({
     address: GetContractAddy(),
     abi: _abi,
     functionName: 'mint',
     args: [quantity],
-    value: ethers.parseEther((cost * quantity).toString()).toString()
+    value: ethers.parseEther((fixedCost * quantity).toString()).toString()
   });
 
   const handleDecreaseQuantity = () => {
@@ -75,7 +72,8 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
-      
+      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
+
       <div className={styles.quantityControl}>
         {mounted && (
           <>
@@ -113,7 +111,7 @@ function MintComponent() {
 
       <div className={styles.mintCostSupply}>
         {mounted && paused && <p>Mint Currently Paused</p>}
-        {mounted && !paused && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
+        {mounted && !paused && <p>Total: {(fixedCost * quantity).toFixed(4)} {nativeToken}</p>}
         {mounted && <p>Supply: {supply} / 2222</p>}
       </div>
 
