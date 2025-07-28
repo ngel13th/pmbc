@@ -46,7 +46,6 @@ function MintComponent() {
     //var proof = GetProof(walletAddress);
     //const isOnList = proof.length > 0;
     const _cost = GetCost(address,quantity);
-    //const _cost = 0.05;
     const _supply = GetSupply();
     //const _mintPhase = GetMintPhase();
     const _mintPhase = 2;
@@ -124,7 +123,7 @@ function MintComponent() {
                         disabled={quantity === minQty}
                     /> : null
                 }
-
+                
                 <img
                     src={`/${quantity}.png`}
                     alt={`Quantity: ${quantity}`}
@@ -139,7 +138,7 @@ function MintComponent() {
                         disabled={quantity === maxQty}
                     /> : null
                 }
-
+                
             </div>
             <div className={styles.mintToControl}>
                 <br></br>
@@ -154,7 +153,7 @@ function MintComponent() {
                 {mounted ? _paused == true && <p>Mint Currently Paused</p> : null}
                 {mounted ? _mintPhase == 0 && <p>Minting Soon</p> : null}
                 {mounted ? _mintPhase == 1 && <p>Whitelist Phase</p> : null}
-                {mounted ? _mintPhase == 2 && <p>{((ethers.parseEther(_cost.toString())) / 10**18) * quantity} {nativeToken}</p> : null}
+                {mounted ? _mintPhase == 2 && <p>{((parseInt(_cost)) / 10**18) * quantity} {nativeToken}</p> : null}
                 {mounted ? _supply >= 0 && <p>Supply: {parseInt(_supply)} / 2222</p> : null}
             </div>
             <div className={styles.mintButton}>
@@ -165,7 +164,7 @@ function MintComponent() {
                     className={styles.mintButton}
                 />
             </div>
-
+            
         </div>
     );
 }
