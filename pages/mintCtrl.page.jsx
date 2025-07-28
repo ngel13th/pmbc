@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
-import { usePaused, useSupply } from './readContract';
+import { GetPaused, GetSupply } from './readContract';
 import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
 
@@ -72,7 +72,8 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
-      
+      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
+
       <div className={styles.quantityControl}>
         {mounted && (
           <>
