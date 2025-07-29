@@ -19,6 +19,7 @@ function MintComponent() {
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
+  const _supply = GetSupply();
 
   useEffect(() => {
     async function fetchContractValues() {
@@ -115,7 +116,7 @@ function MintComponent() {
       <div className={styles.mintCostSupply}>
         {mounted && paused && <p>Mint Currently Paused</p>}
         {mounted && !paused && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
-        {mounted && <p>Supply: {supply} / 2222</p>}
+        {mounted && <p>Supply: {parseInt(_supply)} / 2222</p>}
       </div>
 
       <div className={styles.mintButton}>
