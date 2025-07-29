@@ -1,40 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
-import { GetPaused, GetSupply } from './readContract';
 import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
+import { useSupply } from '../readContract';
+import { usePaused } from '../readContract';
 
 function MintComponent() {
   const { address } = useAccount();
   const mounted = useIsMounted();
   const [quantity, setQuantity] = useState(1);
   const [walletAddress, setWalletAddress] = useState('');
-  const [supply, setSupply] = useState(0);
-  const [paused, setPaused] = useState(true);
+  
+  const { data: supplyRaw } = useSupply();
+  const { data: pausedRaw } = usePaused();
+  const paused = pausedRaw === true;
+  const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
 
-  const mintPhase = 2; // Live Mint
-  const fixedCost = 0.05; // ETH per item
+  const mintPhase = 2;
+  const fixedCost = 0.05;
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
-
-  useEffect(() => {
-    async function fetchContractValues() {
-      try {
-        const [supplyRaw, pausedRaw] = await Promise.all([
-          GetSupply(),
-          GetPaused()
-        ]);
-        setSupply(parseInt(supplyRaw));
-        setPaused(pausedRaw === true);
-      } catch (err) {
-        console.error("Error fetching contract data", err);
-      }
-    }
-    fetchContractValues();
-  }, []);
 
   const { write, isLoading, error } = useContractWrite({
     address: GetContractAddy(),
@@ -72,7 +60,9 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
-      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
+      <h2 style={{ color: "#ffe100", textShadow: "#1a1a1a 1px 0 8px", textAlign: "center" }}>
+        🚀 Mint Is Live — 0.05 {nativeToken} Each
+      </h2>
 
       <div className={styles.quantityControl}>
         {mounted && (
