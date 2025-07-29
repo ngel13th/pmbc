@@ -1,26 +1,35 @@
 import React, { useState } from 'react';
-import { useAccount, useContractWrite } from 'wagmi';
+import { useAccount, useContractRead, useContractWrite } from 'wagmi';
 import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
-import { _abi, GetContractAddy } from './abiGet';
+import { _abi, _abiAddress, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
-import { useSupply } from './readContract';
 
 function MintComponent() {
   const { address } = useAccount();
   const mounted = useIsMounted();
   const [quantity, setQuantity] = useState(1);
   const [walletAddress, setWalletAddress] = useState('');
-  
-  const { data: supplyRaw } = useSupply();
-  const paused = true;
-  const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
 
-  const mintPhase = 2;
-  const fixedCost = 0.05;
   const minQty = 1;
   const maxQty = 5;
   const nativeToken = "ETH";
+  const fixedCost = 0.05;
+
+  const { data: supplyRaw, isLoading: loadingSupply } = useContractRead({
+    address: _abiAddress,
+    abi: _abi,
+    functionName: 'totalSupply',
+  });
+
+  const { data: pausedRaw } = useContractRead({
+    address: _abiAddress,
+    abi: _abi,
+    functionName: 'paused',
+  });
+
+  const paused = pausedRaw === true;
+  const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
 
   const { write, isLoading, error } = useContractWrite({
     address: GetContractAddy(),
@@ -39,9 +48,14 @@ function MintComponent() {
   };
 
   const handleMintClick = () => {
-    if (!address) return alert('Error: Wallet not connected');
-    if (paused) return alert('Error: Minting is paused');
-
+    if (!address) {
+      alert('Error: Wallet not connected');
+      return;
+    }
+    if (paused) {
+      alert('Error: Minting is paused');
+      return;
+    }
     if (walletAddress.length !== 42) {
       alert(`Confirm your send to ${address} then press Mint to complete transaction.`);
       setWalletAddress(address);
@@ -58,9 +72,7 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
-      <h2 style={{ color: "#ffe100", textShadow: "#1a1a1a 1px 0 8px", textAlign: "center" }}>
-        🚀 Mint Is Live — 0.05 {nativeToken} Each
-      </h2>
+      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
 
       <div className={styles.quantityControl}>
         {mounted && (
@@ -98,9 +110,9 @@ function MintComponent() {
       </div>
 
       <div className={styles.mintCostSupply}>
-        {mounted && paused && <p>Mint Currently Paused</p>}
-        {mounted && !paused && <p>Total: {(fixedCost * quantity).toFixed(4)} {nativeToken}</p>}
-        {mounted && <p>Supply: {supply} / 2222</p>}
+        {paused && <p>Mint Currently Paused</p>}
+        {!paused && <p>Total: {(fixedCost * quantity).toFixed(4)} {nativeToken}</p>}
+        {!loadingSupply && <p>Supply: {supply} / 2222</p>}
       </div>
 
       <div className={styles.mintButton}>
