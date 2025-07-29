@@ -28,11 +28,12 @@ export function useSupply() {
 }
 
 // ✅ Hook: useCost
-export function useCost(_sender: '0x${string}') {
+export function useCost(_sender: `0x${string}`) {
   return useContractRead({
     address: _abiAddress,
     abi: _abi,
     functionName: 'cost',
+    args: [], // or args: [_amount] if it needs that
     account: _sender,
     watch: true,
   });
