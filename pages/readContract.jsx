@@ -1,51 +1,52 @@
-// 🛠️ Rename functions to useX and follow React hook rules
-
-import { useContractRead } from 'wagmi';
-import { _abi, _abiAddress } from './abiGet';
+import { useContractRead } from 'wagmi'; 
+import { _abi, _abiAddress } from './abiGet'; 
 import { formatUnits } from 'viem';
 
-// ✅ Hook: usePaused
-export function usePaused() {
-  return useContractRead({
-    address: _abiAddress,
-    abi: _abi,
-    functionName: 'paused',
-    watch: true,
-  });
+export function GetPaused() {
+    const { data, isError, isLoading } = useContractRead({
+        address: _abiAddress,
+        abi: _abi,
+        functionName: 'paused',
+        args: [],
+    });
+
+    return data;
 }
 
-// ✅ Hook: useSupply
-export function useSupply() {
-  const result = useContractRead({
-    address: _abiAddress,
-    abi: _abi,
-    functionName: 'totalSupply',
-    watch: true,
-  });
+export function GetSupply() {
+    const { data, isError, isLoading } = useContractRead({
+        address: _abiAddress,
+        abi: _abi,
+        functionName: 'totalSupply',
+        args: [],
+    });
 
-  const value = result.data ? formatUnits(result.data, 0) : '0';
-  return { ...result, formatted: value };
+    if (isLoading) return 'Loading...';
+if (isError) return 'Error!';
+return formatUnits(data, 0);
+
 }
 
-// ✅ Hook: useCost
-export function useCost(_sender: `0x${string}`) {
-  return useContractRead({
-    address: _abiAddress,
-    abi: _abi,
-    functionName: 'cost',
-    args: [], // or args: [_amount] if it needs that
-    account: _sender,
-    watch: true,
-  });
+export function GetCost(_sender, _amount) {
+    const { data, isError, isLoading } = useContractRead({
+        address: _abiAddress,
+        abi: _abi,
+        functionName: 'cost',
+        args: [],
+        account: _sender,
+    });
+
+    return data;
 }
 
-// ✅ Hook: useAdminCheck
-export function useAdminCheck(_sender: '0x${string}') {
-  return useContractRead({
-    address: _abiAddress,
-    abi: _abi,
-    functionName: 'checkIfAdmin',
-    account: _sender,
-    watch: true,
-  });
+export function AdminCheck(_sender) {
+    const { data, isError, isLoading } = useContractRead({
+        address: _abiAddress,
+        abi: _abi,
+        functionName: 'checkIfAdmin',
+        args: [],
+        account: _sender,
+    });
+
+    return data;
 }
