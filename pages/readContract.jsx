@@ -1,5 +1,6 @@
 import { useContractRead } from 'wagmi'; 
 import { _abi, _abiAddress } from './abiGet'; 
+import { formatUnits } from 'viem';
 
 export function GetPaused() {
     const { data, isError, isLoading } = useContractRead({
