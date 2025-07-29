@@ -5,7 +5,6 @@ import styles from '../styles/Home.module.css';
 import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
 import { useSupply } from './readContract';
-import { usePaused } from './readContract';
 
 function MintComponent() {
   const { address } = useAccount();
@@ -14,8 +13,7 @@ function MintComponent() {
   const [walletAddress, setWalletAddress] = useState('');
   
   const { data: supplyRaw } = useSupply();
-  const { data: pausedRaw } = usePaused();
-  const paused = pausedRaw === true;
+  const paused = true;
   const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
 
   const mintPhase = 2;
