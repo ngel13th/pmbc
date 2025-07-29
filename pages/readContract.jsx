@@ -106,21 +106,3 @@ export function AdminCheck(_sender) {
 //         return null;
 //     }
 // }
-
-export function useSupply() {
-  return useContractRead({
-    address: GetContractAddy(),
-    abi: _abi,
-    functionName: 'totalSupply',
-    watch: true,
-  });
-}
-
-export function usePaused() {
-  return useContractRead({
-    address: GetContractAddy(),
-    abi: _abi,
-    functionName: 'paused',
-    watch: true,
-  });
-}
