@@ -20,7 +20,10 @@ export function GetSupply() {
         args: [],
     });
 
-    return data;
+    if (isLoading) return 'Loading...';
+if (isError) return 'Error!';
+return formatUnits(data, 0);
+
 }
 
 export function GetCost(_sender, _amount) {
