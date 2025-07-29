@@ -116,7 +116,7 @@ function MintComponent() {
       <div className={styles.mintCostSupply}>
         {mounted && paused && <p>Mint Currently Paused</p>}
         {mounted && !paused && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
-        {mounted && <p>Supply: {parseInt(_supply)} / 2222</p>}
+        {mounted && <p>Supply: {_supply} / 2222</p>}
       </div>
 
       <div className={styles.mintButton}>
