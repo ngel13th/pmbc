@@ -4,8 +4,8 @@ import { ethers } from 'ethers';
 import styles from '../styles/Home.module.css';
 import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
-import { useSupply } from '../readContract';
-import { usePaused } from '../readContract';
+import { useSupply } from './readContract';
+import { usePaused } from './readContract';
 
 function MintComponent() {
   const { address } = useAccount();
