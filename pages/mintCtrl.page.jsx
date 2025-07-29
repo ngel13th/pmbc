@@ -28,7 +28,7 @@ function MintComponent() {
     functionName: 'paused',
   });
 
-  const paused = pausedRaw === true;
+  const paused = pausedRaw === false;
   const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
 
   const { write, isLoading, error } = useContractWrite({
@@ -72,7 +72,7 @@ function MintComponent() {
 
   return (
     <div className={styles.mintContainer}>
-      <h2 style={{ color: "#00FFAA", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
+      <h2 style={{ color: "#ffe100", textShadow: "#1a1a1a 1px 0 8px", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
 
       <div className={styles.quantityControl}>
         {mounted && (
