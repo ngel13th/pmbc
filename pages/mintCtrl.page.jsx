@@ -28,7 +28,7 @@ function MintComponent() {
     functionName: 'paused',
   });
 
-  const paused = pausedRaw === false;
+  const paused = pausedRaw === true;
   const supply = supplyRaw ? parseInt(supplyRaw.toString()) : 0;
 
   const { write, isLoading, error } = useContractWrite({
