@@ -1,137 +1,172 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
-import { ethers } from 'ethers';
-import styles from '../styles/Home.module.css';
-import { GetPaused, GetSupply, GetCost } from './readContract';
-import { _abi, GetContractAddy } from './abiGet';
 import { useIsMounted } from './useIsMounted';
+import { GetPaused, GetSupply, GetCost } from './readContract';
+import { _abi, _abiAddress, _listWallets, GetContractAddy } from './abiGet';
+//import { MerkleTree } from 'merkletreejs';
+//import { keccak256 } from 'ethers';
+import styles from '../styles/Home.module.css';
+
+// function GetProof(_address) {
+//     if(!_address || !isValidEthereumAddress(_address)) return [];
+//     // Convert the wallet addresses to an array of strings
+//     const walletAddresses = _listWallets.map(x => keccak256(x));
+//     const merkleTree = new MerkleTree(walletAddresses, keccak256, { sortPairs: true });
+
+//     // Get the index of the wallet address you want to generate a proof for
+//     const wallet = walletAddresses.find(w => w.toLowerCase() === keccak256(_address));
+//     if(wallet){
+//         // Generate a proof for the specified wallet;
+//         const proof = merkleTree.getHexProof(wallet);
+//         // Print the proof
+//         console.log("Proof:", proof);
+//         return proof;
+//     } else {
+//         console.error(`Wallet ${_address} not found in the list.`);
+//         return [];
+//     }
+// }
+
+// function isValidEthereumAddress(_address) {
+//     // Check if the address is a non-empty string
+//     if (typeof _address !== 'string' || _address.length !== 42) {
+//         return false;
+//     }
+
+//     // Check if the address matches the Ethereum address pattern
+//     const addressRegex = /^0x[0-9a-fA-F]{40}$/;
+//     return addressRegex.test(_address);
+// }
 
 function MintComponent() {
-  const { address } = useAccount();
-  const mounted = useIsMounted();
-  const [quantity, setQuantity] = useState(1);
-  const [walletAddress, setWalletAddress] = useState('');
-  const [cost, setCost] = useState(0);
-  const [supply, setSupply] = useState(0);
-  const [paused, setPaused] = useState(true);
+    const { address } = useAccount();
+    const mounted = useIsMounted();
+    const [quantity, setQuantity] = useState(1);
+    const [walletAddress, setWalletAddress] = useState('');
+    //var proof = GetProof(walletAddress);
+    //const isOnList = proof.length > 0;
+    const _cost = GetCost(address,quantity);
+    const _supply = GetSupply();
+    //const _mintPhase = GetMintPhase();
+    const _mintPhase = 2;
+    const _paused = GetPaused();
+    var errorFlag = false;
+    const minQty = 1;
+    const maxQty = 5;
+    const nativeToken = "ETH"; // ETH or MATIC
 
-  const mintPhase = 2; // 🔥 PUBLIC MINT IS LIVE
-  const minQty = 1;
-  const maxQty = 5;
-  const nativeToken = "ETH";
-  const _supply = GetSupply();
+    const { data, isLoading, isSuccess, error, write } = useContractWrite({
+        address: GetContractAddy(),
+        abi: _abi,
+        functionName: 'mint',
+        //args: [walletAddress, quantity, proof],
+        //args: [walletAddress, quantity],
+        args: [quantity],
+        value: (parseInt(_cost)*quantity).toString(),
+    });
 
-  useEffect(() => {
-    async function fetchContractValues() {
-      if (!address) return;
-      try {
-        const [costRaw, supplyRaw, pausedRaw] = await Promise.all([
-          GetCost(address, quantity),
-          GetSupply(),
-          GetPaused()
-        ]);
-        setCost(parseFloat(ethers.formatEther(costRaw)));
-        setSupply(parseInt(supplyRaw));
-        setPaused(pausedRaw === true);
-      } catch (err) {
-        console.error("Error fetching contract data", err);
-      }
-    }
-    fetchContractValues();
-  }, [address, quantity]);
-
-  const { write, isLoading, error } = useContractWrite({
-    address: GetContractAddy(),
-    abi: _abi,
-    functionName: 'mint',
-    args: [quantity],
-    value: ethers.parseEther((cost * quantity).toString()).toString()
-  });
-
-  const handleDecreaseQuantity = () => {
-    if (quantity > minQty) setQuantity(q => q - 1);
-  };
-
-  const handleIncreaseQuantity = () => {
-    if (quantity < maxQty) setQuantity(q => q + 1);
-  };
-
-  const handleMintClick = () => {
-    if (!address) return alert('Error: Wallet not connected');
-    if (paused) return alert('Error: Minting is paused');
-
-    if (walletAddress.length !== 42) {
-      alert(`Confirm your send to ${address} then press Mint to complete transaction.`);
-      setWalletAddress(address);
-      return;
+    if (error && !errorFlag) {
+        alert(`Error: ${error.message}`); // Display the error message in an alert
+        errorFlag = true;
     }
 
-    try {
-      write();
-    } catch (err) {
-      console.error("Minting error:", err);
-      alert('An error occurred while minting. Please try again.');
-    }
-  };
+    const handleDecreaseQuantity = () => {
+        if (quantity > minQty) {
+            setQuantity(quantity - 1);
+        }
+    };
 
-  return (
-    <div className={styles.mintContainer}>
-      <h2 style={{ color: "#ffe100", textShadow: "#1a1a1a 1px 0 8px", textAlign: "center" }}>🚀 Mint Is Live — 0.05 {nativeToken} Each</h2>
+    const handleIncreaseQuantity = () => {
+        if (quantity < maxQty) {
+            setQuantity(quantity + 1);
+        }
+    };
 
-      <div className={styles.quantityControl}>
-        {mounted && (
-          <>
-            <img
-              src="/left_arrow.png"
-              alt="Decrease Quantity"
-              onClick={handleDecreaseQuantity}
-              className={styles.arrowButton}
-              disabled={quantity === minQty}
-            />
-            <img
-              src={`/${quantity}.png`}
-              alt={`Quantity: ${quantity}`}
-              className={styles.quantityImage}
-            />
-            <img
-              src="/right_arrow.png"
-              alt="Increase Quantity"
-              onClick={handleIncreaseQuantity}
-              className={styles.arrowButton}
-              disabled={quantity === maxQty}
-            />
-          </>
-        )}
-      </div>
+    const handleWalletChange = (event) => {
+        setWalletAddress(event.target.value);
+        //proof = GetProof(event.target.value);
+    };
 
-      <div className={styles.mintToControl}>
-        <input
-          type="text"
-          value={walletAddress}
-          onChange={e => setWalletAddress(e.target.value)}
-          placeholder="Wallet Address"
-        />
-      </div>
+    const handleMintClick = () => {
+        // Perform minting logic here
+        if (!address) {
+            alert(`Error: Not Connected`);
+            return;
+        }
+        if (_paused == true){
+            alert(`Error: Paused`);
+            return;
+        }
+        if (walletAddress.length !== 42) {
+            alert(`Confirm your send to ${address} then press Mint to complete transaction.`);
+            setWalletAddress(address);
+        } else {
+            try {
+                write(); // Call the write function
+                //alert(`This would have minted ${quantity} NFTs!`);
+            } catch (error) {
+                console.error('Error while minting:', error);
+                alert('An error occurred while minting. Please try again later.');
+            }
+        }
+    };
 
-      <div className={styles.mintCostSupply}>
-        {mounted && paused && <p>Mint Currently Paused</p>}
-        {mounted && !paused && <p>{(cost * quantity).toFixed(4)} {nativeToken}</p>}
-        {mounted && <p>Supply: {_supply} / 2222</p>}
-      </div>
-
-      <div className={styles.mintButton}>
-        <img
-          src="/mint.png"
-          alt="Mint Button"
-          onClick={handleMintClick}
-          className={styles.mintButton}
-          style={{ opacity: isLoading ? 0.5 : 1 }}
-        />
-      </div>
-
-      {error && <p style={{ color: 'red' }}>Minting Error: {error.message}</p>}
-    </div>
-  );
+    return (
+        <div className={styles.mintContainer}>
+            <div className={styles.quantityControl}>
+                {mounted ? _mintPhase != 0 && 
+                    <img
+                        src="/left_arrow.png"
+                        alt="Decrease Quantity"
+                        onClick={handleDecreaseQuantity}
+                        className={styles.arrowButton}
+                        disabled={quantity === minQty}
+                    /> : null
+                }
+                
+                <img
+                    src={`/${quantity}.png`}
+                    alt={`Quantity: ${quantity}`}
+                    className={styles.quantityImage}
+                />
+                {mounted ? _mintPhase != 0 && 
+                    <img
+                        src="/right_arrow.png"
+                        alt="Increase Quantity"
+                        onClick={handleIncreaseQuantity}
+                        className={styles.arrowButton}
+                        disabled={quantity === maxQty}
+                    /> : null
+                }
+                
+            </div>
+            <div className={styles.mintToControl}>
+                <br></br>
+                <input
+                    type="text"
+                    value={walletAddress}
+                    onChange={handleWalletChange}
+                    placeholder="Wallet Address"
+                />
+            </div>
+            <div className={styles.mintCostSupply}>
+                {mounted ? _paused == true && <p>Mint Currently Paused</p> : null}
+                {mounted ? _mintPhase == 0 && <p>Minting Soon</p> : null}
+                {mounted ? _mintPhase == 1 && <p>Whitelist Phase</p> : null}
+                {mounted ? _mintPhase == 2 && <p>{((parseInt(_cost)) / 10**18) * quantity} {nativeToken}</p> : null}
+                {mounted ? _supply >= 0 && <p>Supply: {parseInt(_supply)} / 2222</p> : null}
+            </div>
+            <div className={styles.mintButton}>
+                <img
+                    src="/mint.png"
+                    alt="Mint Button"
+                    onClick={handleMintClick}
+                    className={styles.mintButton}
+                />
+            </div>
+            
+        </div>
+    );
 }
 
 export default MintComponent;
